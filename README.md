@@ -33,6 +33,7 @@ This is a Next.js starter project for ReportCraft AI.
 4. **Open your browser:**
 
    Visit [http://localhost:3000](http://localhost:3000) to see the app.
+   Login to acces app functionality
 
 ---
 
