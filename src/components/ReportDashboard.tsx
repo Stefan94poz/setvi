@@ -1,24 +1,47 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { useReports } from '@/hooks/useReports';
-import type { Report, ReportInput } from '@/types/report';
-import { ReportList } from './ReportList';
-import { ReportDialog } from './ReportDialog';
-import { AppHeader } from './AppHeader';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from './ui/skeleton';
+import { useState, useMemo } from "react";
+import { useReports } from "@/hooks/useReports";
+import type { Report, ReportInput } from "@/types/report";
+import { ReportList } from "./ReportList";
+import { ReportDialog } from "./ReportDialog";
+import { AppHeader } from "./AppHeader";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "./ui/skeleton";
+import { LoginDialog } from "./LoginDialog";
+import { set } from "date-fns";
+import { Activity } from "lucide-react";
+import { ActivityDialog } from "./ActivityDialog";
 
 export function ReportDashboard() {
-  const { reports, addReport, editReport, deleteReport: deleteReportFromContext, reorderReports, isLoading, getReportById } = useReports();
+  const {
+    reports,
+    addReport,
+    editReport,
+    deleteReport: deleteReportFromContext,
+    reorderReports,
+    isLoading,
+    getReportById,
+  } = useReports();
   const { toast } = useToast();
 
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-  const [reportToEdit, setReportToEdit] = useState<Report | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [reportToDeleteId, setReportToDeleteId] = useState<string | null>(null);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [isActivityDialogOpen, setIsActivityDialogOpen] = useState(false);
 
+  const [reportToEdit, setReportToEdit] = useState<Report | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [reportToDeleteId, setReportToDeleteId] = useState<string | null>(null);
 
   const filteredReports = useMemo(() => {
     if (!searchTerm) return reports;
@@ -32,6 +55,13 @@ export function ReportDashboard() {
     setIsReportDialogOpen(true);
   };
 
+  const handleLogin = () => {
+    setIsLoginDialogOpen(true);
+  };
+
+  const handleActivity = () => {
+    setIsActivityDialogOpen(true);
+  };
   const handleEditReport = (report: Report) => {
     setReportToEdit(report);
     setIsReportDialogOpen(true);
@@ -44,18 +74,29 @@ export function ReportDashboard() {
   const confirmDeleteReport = () => {
     if (reportToDeleteId) {
       deleteReportFromContext(reportToDeleteId);
-      toast({ title: 'Report Deleted', description: 'The report has been successfully deleted.' });
+      toast({
+        title: "Report Deleted",
+        description: "The report has been successfully deleted.",
+      });
       setReportToDeleteId(null);
     }
   };
 
   const handleSaveReport = (reportData: ReportInput | Report) => {
-    if ('id' in reportData) { // Editing existing report
+    if ("id" in reportData) {
+      // Editing existing report
       editReport(reportData as Report);
-      toast({ title: 'Report Updated', description: 'Your report has been successfully updated.' });
-    } else { // Creating new report
+      toast({
+        title: "Report Updated",
+        description: "Your report has been successfully updated.",
+      });
+    } else {
+      // Creating new report
       addReport(reportData as ReportInput);
-      toast({ title: 'Report Created', description: 'A new report has been successfully created.' });
+      toast({
+        title: "Report Created",
+        description: "A new report has been successfully created.",
+      });
     }
     setIsReportDialogOpen(false);
     setReportToEdit(null); // Clear editing state
@@ -64,17 +105,17 @@ export function ReportDashboard() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 md:px-6 py-8">
-         <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b py-4 px-4 md:px-6 mb-6">
-            <div className="container mx-auto flex items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                    <Skeleton className="h-8 w-8 rounded-full" />
-                    <Skeleton className="h-7 w-40" />
-                </div>
-                <div className="flex items-center gap-4 flex-1 max-w-md">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-32" />
-                </div>
+        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b py-4 px-4 md:px-6 mb-6">
+          <div className="container mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="h-7 w-40" />
             </div>
+            <div className="flex items-center gap-4 flex-1 max-w-md">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
         </div>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
@@ -85,13 +126,14 @@ export function ReportDashboard() {
     );
   }
 
-
   return (
     <div className="min-h-screen flex flex-col">
       <AppHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         onCreateReport={handleCreateReport}
+        handleLogin={handleLogin}
+        handleActivity={handleActivity}
       />
       <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
         <ReportList
@@ -107,17 +149,35 @@ export function ReportDashboard() {
         onSave={handleSaveReport}
         reportToEdit={reportToEdit}
       />
-      <AlertDialog open={!!reportToDeleteId} onOpenChange={(open) => !open && setReportToDeleteId(null)}>
+      <LoginDialog
+        isOpen={isLoginDialogOpen}
+        onOpenChange={setIsLoginDialogOpen}
+      />
+      <ActivityDialog
+        isOpen={isActivityDialogOpen}
+        onOpenChange={setIsActivityDialogOpen}
+      />
+      <AlertDialog
+        open={!!reportToDeleteId}
+        onOpenChange={(open) => !open && setReportToDeleteId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the report titled &quot;{reportToDeleteId ? getReportById(reportToDeleteId)?.title : ''}&quot;.
+              This action cannot be undone. This will permanently delete the
+              report titled &quot;
+              {reportToDeleteId ? getReportById(reportToDeleteId)?.title : ""}
+              &quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setReportToDeleteId(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteReport}>Delete</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setReportToDeleteId(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteReport}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

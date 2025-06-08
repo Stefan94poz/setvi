@@ -1,6 +1,6 @@
-import type { Report, ReportInput } from '@/types/report';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import type { Report, ReportInput } from "@/types/report";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,13 +9,13 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Wand2, Loader2 } from 'lucide-react';
-import { GenerateDraftDialog } from './GenerateDraftDialog';
-import { useToast } from '@/hooks/use-toast';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Wand2, Loader2 } from "lucide-react";
+import { GenerateDraftDialog } from "./GenerateDraftDialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface ReportDialogProps {
   isOpen: boolean;
@@ -24,9 +24,14 @@ interface ReportDialogProps {
   reportToEdit?: Report | null;
 }
 
-export function ReportDialog({ isOpen, onOpenChange, onSave, reportToEdit }: ReportDialogProps) {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+export function ReportDialog({
+  isOpen,
+  onOpenChange,
+  onSave,
+  reportToEdit,
+}: ReportDialogProps) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isGenerateDraftOpen, setIsGenerateDraftOpen] = useState(false);
   const { toast } = useToast();
@@ -35,24 +40,25 @@ export function ReportDialog({ isOpen, onOpenChange, onSave, reportToEdit }: Rep
     if (reportToEdit && isOpen) {
       setTitle(reportToEdit.title);
       setContent(reportToEdit.content);
-    } else if (!isOpen) { // Reset form when dialog closes and not editing
-      setTitle('');
-      setContent('');
+    } else if (!isOpen) {
+      // Reset form when dialog closes and not editing
+      setTitle("");
+      setContent("");
     }
   }, [reportToEdit, isOpen]);
 
   const handleSave = () => {
     if (!title.trim()) {
       toast({
-        variant: 'destructive',
-        title: 'Title Required',
-        description: 'Please enter a title for the report.',
+        variant: "destructive",
+        title: "Title Required",
+        description: "Please enter a title for the report.",
       });
       return;
     }
     setIsSaving(true);
     const reportData = { title, content };
-    
+
     if (reportToEdit) {
       onSave({ ...reportToEdit, ...reportData });
     } else {
@@ -69,20 +75,26 @@ export function ReportDialog({ isOpen, onOpenChange, onSave, reportToEdit }: Rep
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={(open) => {
-        onOpenChange(open);
-        if (!open) { // Explicitly clear form on close if not handled by useEffect due to reportToEdit
-          setTitle('');
-          setContent('');
-        }
-      }}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          onOpenChange(open);
+          if (!open) {
+            // Explicitly clear form on close if not handled by useEffect due to reportToEdit
+            setTitle("");
+            setContent("");
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[625px] max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="font-headline">
-              {reportToEdit ? 'Edit Report' : 'Create New Report'}
+              {reportToEdit ? "Edit Report" : "Create New Report"}
             </DialogTitle>
             <DialogDescription>
-              {reportToEdit ? 'Update the details of your report.' : 'Fill in the details to create a new report.'}
+              {reportToEdit
+                ? "Update the details of your report."
+                : "Fill in the details to create a new report."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4 flex-grow overflow-y-auto pr-2">
@@ -131,9 +143,15 @@ export function ReportDialog({ isOpen, onOpenChange, onSave, reportToEdit }: Rep
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="button" onClick={handleSave} disabled={isSaving || !title.trim()}>
-              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {reportToEdit ? 'Save Changes' : 'Create Report'}
+            <Button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving || !title.trim()}
+            >
+              {isSaving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {reportToEdit ? "Save Changes" : "Create Report"}
             </Button>
           </DialogFooter>
         </DialogContent>
