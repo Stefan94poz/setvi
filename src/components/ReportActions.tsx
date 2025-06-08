@@ -20,7 +20,6 @@ interface ReportActionsProps {
   ) => Promise<
     Awaited<ReturnType<typeof summarizeReportContent>> | { error: string }
   >;
-  onCreate?: () => void; // Optional: pass this if you want to show create
 }
 
 function addActivity(name: string) {
@@ -43,7 +42,6 @@ export function ReportActions({
   onEdit,
   onDelete,
   onSummarize,
-  onCreate,
 }: ReportActionsProps) {
   const { toast } = useToast();
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -94,23 +92,8 @@ export function ReportActions({
     onDelete();
   };
 
-  const handleCreate = () => {
-    addActivity("Create report");
-    onCreate?.();
-  };
-
   return (
     <div className="flex space-x-2">
-      {isAdmin && onCreate && (
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleCreate}
-          aria-label="Create report"
-        >
-          <PlusCircle className="h-4 w-4" />
-        </Button>
-      )}
       {isAdmin && (
         <Button
           variant="outline"

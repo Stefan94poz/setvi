@@ -47,6 +47,21 @@ export function ReportDialog({
     }
   }, [reportToEdit, isOpen]);
 
+  function addActivity(name: string) {
+    const userData = localStorage.getItem("userData");
+    if (!userData) return;
+    try {
+      const user = JSON.parse(userData);
+      const activity = {
+        name,
+        timestamp: new Date().toLocaleString(),
+      };
+      user.activity = Array.isArray(user.activity) ? user.activity : [];
+      user.activity.unshift(activity); // add to start
+      localStorage.setItem("userData", JSON.stringify(user));
+    } catch {}
+  }
+
   const handleSave = () => {
     if (!title.trim()) {
       toast({
@@ -59,13 +74,14 @@ export function ReportDialog({
     setIsSaving(true);
     const reportData = { title, content };
 
+    // Add activity for create or edit
     if (reportToEdit) {
+      addActivity("edit report");
       onSave({ ...reportToEdit, ...reportData });
     } else {
+      addActivity("Create report");
       onSave(reportData);
     }
-    // onOpenChange(false); // Closing is handled by parent or onSave success
-    // Resetting state is handled by useEffect or parent
     setIsSaving(false);
   };
 

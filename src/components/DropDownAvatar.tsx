@@ -47,8 +47,20 @@ export function DropDownAvatar({ handleActivity }: DropDownAvatarProps) {
           onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside dropdown
         >
           <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-            <div>Bonnie Green</div>
-            <div className="font-medium truncate">name@flowbite.com</div>
+            <div>
+              <p className="capitalize font-semibold">
+                {(() => {
+                  try {
+                    const userData = localStorage.getItem("userData");
+                    if (userData) {
+                      const user = JSON.parse(userData);
+                      return user?.name;
+                    }
+                  } catch {}
+                  return "User";
+                })()}
+              </p>
+            </div>
           </div>
           <ul
             className="py-2 text-sm text-gray-700 dark:text-gray-200"
